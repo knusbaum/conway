@@ -1,0 +1,50 @@
+//kage:unit pixels
+package main
+
+var FadeDivisor int
+
+// Decodes a vec4 RGBA into a uint32
+func ToUint32(v vec4) int {
+	return (int(v.a*255) << 24) |
+		(int(v.b*255) << 16) |
+		(int(v.g*255) << 8) |
+		int(v.r*255)
+}
+
+// Encodes a uint32 into a vec4 RGBA
+func FromUint32(i int) vec4 {
+	return vec4(
+		float(i&0xFF)/255,
+		float((i>>8)&0xFF)/255,
+		float((i>>16)&0xFF)/255,
+		float((i>>24)&0xFF)/255,
+	)
+}
+
+func val(v vec4) float {
+	return ceil(clamp(v.r+v.g+v.b, 0, 1))
+}
+
+func Fragment(targetCoords vec4, sourceCoords vec2, _ vec4) vec4 {
+	current := imageSrc0At(sourceCoords)
+	up := imageSrc0At(vec2(sourceCoords.x, sourceCoords.y-1))
+	upright := imageSrc0At(vec2(sourceCoords.x+1, sourceCoords.y-1))
+	right := imageSrc0At(vec2(sourceCoords.x+1, sourceCoords.y))
+	downright := imageSrc0At(vec2(sourceCoords.x+1, sourceCoords.y+1))
+	down := imageSrc0At(vec2(sourceCoords.x, sourceCoords.y+1))
+	downleft := imageSrc0At(vec2(sourceCoords.x-1, sourceCoords.y+1))
+	left := imageSrc0At(vec2(sourceCoords.x-1, sourceCoords.y))
+	upleft := imageSrc0At(vec2(sourceCoords.x-1, sourceCoords.y-1))
+
+	total := val(up) + val(upright) + val(right) + val(downright) + val(down) + val(downleft) + val(left) + val(upleft)
+
+	if total < 2 {
+		return vec4(0)
+	} else if total == 2 {
+		return current // if alive, stay alive. If dead, stay dead.
+	} else if total == 3 {
+		return vec4(1, 1, 1, 1) // any cell with 3 neighbors becomes alive
+	} else {
+		return vec4(0) // more than 3 dies
+	}
+}
