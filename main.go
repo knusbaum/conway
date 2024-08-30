@@ -92,7 +92,20 @@ func (self *Game) Update() error {
 		doLine(mmx, mmy, ox, oy, func(cx, cy int) {
 			self.active.Set(cx, cy, color.RGBA{255, 0, 0, 255})
 		})
-		//}
+	} else if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		bounds := self.active.Bounds()
+		scaledWidth := float32(bounds.Dx()) / self.scale
+		scaledHeight := float32(bounds.Dy()) / self.scale
+
+		mmx := self.offsetx + int(scaledWidth*float32(mx)/WIDTH)
+		mmy := self.offsety + int(scaledHeight*float32(my)/HEIGHT)
+
+		ox := self.offsetx + int(scaledWidth*float32(self.mousePX)/WIDTH)
+		oy := self.offsety + int(scaledHeight*float32(self.mousePY)/HEIGHT)
+
+		doLine(mmx, mmy, ox, oy, func(cx, cy int) {
+			self.active.Set(cx, cy, color.RGBA{0, 0, 0, 0})
+		})
 	} else if ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
 
 		self.offsetx -= (mx - self.mousePX) / 2
