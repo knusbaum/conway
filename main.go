@@ -78,6 +78,9 @@ func (self *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		self.pause = !self.pause
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		self.active.Clear()
+	}
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		bounds := self.active.Bounds()
 		scaledWidth := float32(bounds.Dx()) / self.scale
@@ -137,6 +140,7 @@ func (self *Game) Update() error {
 	self.mousePY = my
 
 	if self.frame%10 == 0 && !self.pause {
+		//if !self.pause {
 		self.buff.Clear()
 		// map the vertices to the target image
 		bounds := self.buff.Bounds()
